@@ -1,12 +1,14 @@
-from flask import Flask, render_template, redirect, url_for
+from flask import Flask, render_template, redirect, url_for, abort
 from flask_socketio import SocketIO, emit, join_room, leave_room
+from collections import deque
 from urlgen import urlgen
+import uuid
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'secret ~'
 socketio = SocketIO(app)
 
-suffix_to_sessionid = {}
+rooms = {}
 
 ######################
 ##  Route Handlers  ##
@@ -19,17 +21,27 @@ def index():
 @app.route('/create')
 @app.route('/create/')
 def show_create():
-
-	# generate url suffix
+	# Generate url suffix
 	suffix = urlgen.generate()
-
-	return redirect(url_for(suffix))
+	rooms[suffix] = {
+		'id': uuid.uuid4(),
+		'suffix': suffix
+		'members': []
+	}
+	return redirect('/' + suffix)
 
 @app.route('/join')
 @app.route('/join/')
 def show_join():
 	return render_template('join.html')
 
+@app.route('/<roomname>')
+def enter_room(roomname):
+	print(roomname);
+	if roomname in rooms:
+		return render_template("chatroom.html", room=rooms[roomname])
+	else:
+		return abort(404)
 
 ######################
 ##  Event Handlers  ##
