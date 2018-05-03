@@ -21,12 +21,15 @@ def index():
 @app.route('/create')
 @app.route('/create/')
 def show_create():
-	# Generate url suffix
+	# Generate a unique url suffix
 	suffix = urlgen.generate()
+	while suffix in rooms:
+		suffix = urlgen.generate()
+	# Create an empty room entry for this suffix
 	rooms[suffix] = {
 		'id': uuid.uuid4(),
 		'suffix': suffix,
-		'members': {}
+		'users': {}
 	}
 	return redirect('/' + suffix)
 
@@ -37,8 +40,9 @@ def show_join():
 
 @app.route('/<roomname>')
 def enter_room(roomname):
+	# Serve room if it exists
 	if roomname in rooms:
-		return render_template("chatroom.html", room=rooms[roomname])
+		return render_template("chatroom.html", roomname=roomname)
 	else:
 		return abort(404)
 
@@ -56,18 +60,23 @@ def handle_disconnect():
 
 @socketio.on('join')
 def handle_join(data):
+	# Extract username, room, and session id
 	username = data['username']
 	room = data['room']
+	if room not in rooms:
+		return
 	sid = request.sid
-	rooms[room][sid] = username
+	# Map username to session id in room space
+	rooms[room]['users'][sid] = username
 	join_room(room)
-	send(rooms[room][sid] + ' has entered the room.', room=room)
+	send(username + ' has entered the room.', room=room)
 
 @socketio.on('message')
 def handle_msg(data):
 	room = data['room']
 	sid = request.sid
-	emit('broadcast', {'sender': rooms[room][sid], 'msg': data['msg']}, room=room)
+	# Echo received messages back to room
+	emit('broadcast', {'sender': rooms[room]['users'][sid], 'msg': data['msg']}, room=room)
 
 #############
 ##  Entry  ##

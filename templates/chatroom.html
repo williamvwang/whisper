@@ -1,11 +1,11 @@
 <html>
 
 <head>
-  <title>{{ room.suffix }}</title>
+  <title>{{ roomname }}</title>
 
     <!-- Styles -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.7.1/css/bulma.min.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.0.7/css/all.css">
     <style>
       .selectable{
         -webkit-touch-callout: all; /* iOS Safari */
@@ -26,16 +26,17 @@
   <div class="hero-head">
     <nav class="level">
       <div class="level-left">
-        <div class="level-item">
-        <p class="subtitle is-4">
-          chatroom
+        <div class="level-item" style="padding: 0 0.5em">
+        <p class="subtitle is-3">
+          <a href="/">whisper</a>
         </p>
       </div>
       </div>
       <div class="level-right">
-        <div class="level-item">
-        <p class="subtitle is-4 selectable" title="click to select all">
-          {{ room.suffix }}
+        <div class="level-item" style="padding: 0 0.5em">
+        <i class="fas fa-link"></i>&nbsp;
+        <p class="subtitle is-6 selectable" title="click to select all">
+          {{ roomname }}
         </p>
       </div>
       </div>
@@ -84,7 +85,7 @@
         </div>
         <div class="control">
           <a id="setuser" class="button is-large is-black">
-            <i class="fa fa-check-circle"></i>
+            <i class="fas fa-check-circle"></i>
           </a>
         </div>
       </div>
@@ -96,11 +97,12 @@
 
 <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/socket.io/2.1.0/socket.io.js"></script>
 <script type="text/javascript" charset="utf-8">
-    const roomname = '{{ room.suffix }}';
+    const roomname = '{{ roomname }}';
 
     document.addEventListener("DOMContentLoaded", function() {
         var setuser = document.getElementById("setuser");
         var userfield = document.getElementById("userfield");
+        // Username modal handling
         setuser.addEventListener('click', function() {
             if (userfield.value.length > 0) {
                 clientSetup(userfield.value);
@@ -113,17 +115,21 @@
 
     var clientSetup = function(username) {
         var socket = io.connect('http://' + document.domain + ':' + location.port);
+
+        // Join specified room on socket connect
         socket.on('connect', function() {
             console.log('joining room ' + roomname);
             socket.emit('join', {room: roomname, username: username});
         });
 
+        // Message receiving
         var chatarea = document.getElementById('chatarea');
         socket.on('message', function(data) {
             console.log(data);
             chatarea.innerHTML = chatarea.innerHTML + data + '<br/>';
         })
 
+        // Broadcast receiving
         socket.on('broadcast', function(data) {
             console.log(data);
             var sender = data['sender'];
@@ -132,6 +138,7 @@
             chatarea.innerHTML = chatarea.innerHTML + to_append;
         })
 
+        // Message sending
         var textinput = document.getElementById('textinput');
         var button = document.getElementById("send");
         button.addEventListener('click', function() {
