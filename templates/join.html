@@ -24,12 +24,12 @@
       <h2 class="subtitle">
         enter your unique conversation code
       </h2>
-      <div class="field has-addons" style="justify-content: center;">
+      <div class="field has-addons has-addons-centered">
         <div class="control">
-          <input class="input is-large" type="text" placeholder="enter code here">
+          <input id="code" class="input is-large" type="text" placeholder="enter code here">
         </div>
         <div class="control">
-          <a class="button is-large is-black">
+          <a id="join" class="button is-large is-black">
             join
           </a>
         </div>
@@ -41,5 +41,14 @@
   <div class="hero-foot">
   </div>
 </section>
+
+<script>
+  var field = document.getElementById("code");
+  var button = document.getElementById("join");
+
+  button.addEventListener('click', function() {
+    window.location.href = '/' + field.value;
+  }, false);
+</script>
 
 </body>

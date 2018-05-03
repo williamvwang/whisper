@@ -1,5 +1,5 @@
-from flask import Flask, render_template, redirect, url_for, abort
-from flask_socketio import SocketIO, emit, join_room, leave_room
+from flask import Flask, render_template, redirect, abort, request
+from flask_socketio import SocketIO, send, emit, join_room, leave_room
 from collections import deque
 from urlgen import urlgen
 import uuid
@@ -25,8 +25,8 @@ def show_create():
 	suffix = urlgen.generate()
 	rooms[suffix] = {
 		'id': uuid.uuid4(),
-		'suffix': suffix
-		'members': []
+		'suffix': suffix,
+		'members': {}
 	}
 	return redirect('/' + suffix)
 
@@ -37,7 +37,6 @@ def show_join():
 
 @app.route('/<roomname>')
 def enter_room(roomname):
-	print(roomname);
 	if roomname in rooms:
 		return render_template("chatroom.html", room=rooms[roomname])
 	else:
@@ -48,17 +47,27 @@ def enter_room(roomname):
 ######################
 
 @socketio.on('connect')
-def handle_connect(user):
+def handle_connect():
 	emit('response', {'data': 'user connected'})
 
 @socketio.on('disconnect')
-def handle_connect(user):
+def handle_disconnect():
 	emit('response', {'data': 'user connected'})
 
-@socketio.on('msg')
-def handle_msg(msg):
-	emit('response', {'data': 'message received'})
+@socketio.on('join')
+def handle_join(data):
+	username = data['username']
+	room = data['room']
+	sid = request.sid
+	rooms[room][sid] = username
+	join_room(room)
+	send(rooms[room][sid] + ' has entered the room.', room=room)
 
+@socketio.on('message')
+def handle_msg(data):
+	room = data['room']
+	sid = request.sid
+	emit('broadcast', {'sender': rooms[room][sid], 'msg': data['msg']}, room=room)
 
 #############
 ##  Entry  ##
