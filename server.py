@@ -1,82 +1,58 @@
-from flask import Flask, render_template, redirect, abort, request
-from flask_socketio import SocketIO, send, emit, join_room, leave_room
-from collections import deque
-from urlgen import urlgen
-import uuid
+from flask import Flask, request
+from flask_socketio import SocketIO, send, emit, join_room, leave_room, close_room
+
+from whisper.views import routes
+from whisper.common import common
 
 app = Flask(__name__)
-app.config['SECRET_KEY'] = 'secret ~'
+app.config['SECRET_KEY'] = 'it\'s a secret ~'
+app.register_blueprint(routes)
+
+# TODO: move SocketIO into subpackage
 socketio = SocketIO(app)
 
-rooms = {}
-
-######################
-##  Route Handlers  ##
-######################
-
-@app.route('/')
-def index():
-	return render_template('index.html')
-
-@app.route('/create')
-@app.route('/create/')
-def show_create():
-	# Generate a unique url suffix
-	suffix = urlgen.generate()
-	while suffix in rooms:
-		suffix = urlgen.generate()
-	# Create an empty room entry for this suffix
-	rooms[suffix] = {
-		'id': uuid.uuid4(),
-		'suffix': suffix,
-		'users': {}
-	}
-	return redirect('/' + suffix)
-
-@app.route('/join')
-@app.route('/join/')
-def show_join():
-	return render_template('join.html')
-
-@app.route('/<roomname>')
-def enter_room(roomname):
-	# Serve room if it exists
-	if roomname in rooms:
-		return render_template("chatroom.html", roomname=roomname)
-	else:
-		return abort(404)
-
-######################
-##  Event Handlers  ##
-######################
-
-@socketio.on('connect')
-def handle_connect():
-	emit('response', {'data': 'user connected'})
-
-@socketio.on('disconnect')
-def handle_disconnect():
-	emit('response', {'data': 'user connected'})
+###############################
+##  SocketIO Event Handlers  ##
+###############################
 
 @socketio.on('join')
 def handle_join(data):
-	# Extract username, room, and session id
 	username = data['username']
 	room = data['room']
-	if room not in rooms:
+	if room not in common.rooms:
 		return
-	sid = request.sid
-	# Map username to session id in room space
-	rooms[room]['users'][sid] = username
+	session_id = request.sid
+	# Map username to user session id in room space
+	common.rooms[room]['users'][session_id] = username
 	join_room(room)
-	send(username + ' has entered the room.', room=room)
+	print(username + ' joined ' + room)
+	send(username + ' has joined the chatroom.', room=room)
+
+@socketio.on('leave')
+def handle_leave(data):
+	username = data['username']
+	room = data['room']
+	session_id = request.sid
+	leave_room(room)
+	print(username + ' left ' + room)
+	send(username + ' has left the chatroom.', room=room)
+	del common.rooms[room]['users'][session_id]
+	# Delete room if all users have left
+	if len(common.rooms[room]['users']) == 0:
+		print('disposing room ' + room)
+		close_room(room)
+		del common.rooms[room]
+		
 
 @socketio.on('message')
 def handle_msg(data):
 	room = data['room']
-	sid = request.sid
+	session_id = request.sid
 	# Echo received messages back to room
-	emit('broadcast', {'sender': rooms[room]['users'][sid], 'msg': data['msg']}, room=room)
+	emit('broadcast', {
+		'sender': common.rooms[room]['users'][session_id],
+		'msg': data['msg']
+	}, room=room)
 
 #############
 ##  Entry  ##

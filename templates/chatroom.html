@@ -3,150 +3,163 @@
 <head>
   <title>{{ roomname }}</title>
 
-    <!-- Styles -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.7.1/css/bulma.min.css">
-    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.0.7/css/all.css">
-    <style>
-      .selectable{
-        -webkit-touch-callout: all; /* iOS Safari */
-        -webkit-user-select: all; /* Safari */
-        -khtml-user-select: all; /* Konqueror HTML */
-        -moz-user-select: all; /* Firefox */
-        -ms-user-select: all; /* Internet Explorer/Edge */
-        user-select: all; /* Chrome and Opera */
+  <!-- Styles -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.7.1/css/bulma.min.css">
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.0.7/css/all.css">
+  <style>
+    .selectable {
+      /* iOS Safari */
+      -webkit-touch-callout: all;
+      /* Safari */
+      -webkit-user-select: all;
+      /* Konqueror HTML */
+      -khtml-user-select: all;
+      /* Firefox */
+      -moz-user-select: all;
+      /* Internet Explorer/Edge */
+      -ms-user-select: all;
+      /* Chrome and Opera */
+      user-select: all;
     }
-    </style>
+  </style>
 </head>
 
 <body>
 
-<!-- Hero -->
-<section class="hero is-fullheight is-dark is-bold">
-  <!-- Hero Head -->
-  <div class="hero-head">
-    <nav class="level">
-      <div class="level-left">
-        <div class="level-item" style="padding: 0 0.5em">
-        <p class="subtitle is-3">
-          <a href="/">whisper</a>
-        </p>
-      </div>
-      </div>
-      <div class="level-right">
-        <div class="level-item" style="padding: 0 0.5em">
-        <i class="fas fa-link"></i>&nbsp;
-        <p class="subtitle is-6 selectable" title="click to select all">
-          {{ roomname }}
-        </p>
-      </div>
-      </div>
-    </nav>
-  </div>
-
-  <!-- Hero Body -->
-  <div class="hero-body" style="align-items: normal !important;">
-    <div class="container is-fluid">
-      <div id="chatarea">
-      </div>
-    </div>
-  </div>
-
-  <!-- Hero Foot -->
-  <div class="hero-foot">
-    <div class="container is-fluid">
-      <div class="field has-addons">
-        <div class="control is-expanded">
-          <input id="textinput" class="input" type="text" placeholder="type a message...">
+  <!-- Hero -->
+  <section class="hero is-fullheight is-dark is-bold">
+    <!-- Hero Head -->
+    <div class="hero-head">
+      <nav class="level">
+        <div class="level-left">
+          <div class="level-item" style="padding: 0 0.5em">
+            <p class="subtitle is-3">
+              <a href="/">whisper</a>
+            </p>
+          </div>
         </div>
-        <div class="control">
-          <a id="send" class="button is-black">
-            send
-          </a>
+        <div class="level-right">
+          <div class="level-item" style="padding: 0 0.5em">
+            <i class="fas fa-link"></i>&nbsp;
+            <p class="subtitle is-6 selectable" title="click to select all">
+              {{ roomname }}
+            </p>
+          </div>
+        </div>
+      </nav>
+    </div>
+
+    <!-- Hero Body -->
+    <div class="hero-body" style="align-items: normal !important;">
+      <div class="container is-fluid">
+        <div id="chatarea">
         </div>
       </div>
     </div>
-  </div>
-</section>
 
-<!-- Modal -->
-<div id="modal" class="modal is-active">
-  <div class="modal-background"></div>
-  <div class="modal-content">
-    <div class="box">
-      <h1 class="title">
-        welcome to whisper
-      </h1>
-      <h2 class="subtitle">
-        please enter a username
-      </h2>
-      <div class="field has-addons has-addons-centered">
-        <div class="control">
-          <input id="userfield" class="input is-large" type="text" placeholder="your desired username">
+    <!-- Hero Foot -->
+    <div class="hero-foot">
+      <div class="container is-fluid">
+        <div class="field has-addons">
+          <div class="control is-expanded">
+            <input id="textinput" class="input" type="text" placeholder="type a message...">
+          </div>
+          <div class="control">
+            <a id="send" class="button is-black">
+              send
+            </a>
+          </div>
         </div>
-        <div class="control">
-          <a id="setuser" class="button is-large is-black">
-            <i class="fas fa-check-circle"></i>
-          </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Modal -->
+  <div id="modal" class="modal is-active">
+    <div class="modal-background"></div>
+    <div class="modal-content">
+      <div class="box">
+        <h1 class="title">
+          welcome to whisper
+        </h1>
+        <h2 class="subtitle">
+          please enter a username
+        </h2>
+        <div class="field has-addons has-addons-centered">
+          <div class="control">
+            <input id="userfield" class="input is-large" type="text" placeholder="your desired username">
+          </div>
+          <div class="control">
+            <a id="setuser" class="button is-large is-black">
+              <i class="fas fa-check-circle"></i>
+            </a>
+          </div>
         </div>
       </div>
     </div>
   </div>
-</div>
 
 </body>
 
 <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/socket.io/2.1.0/socket.io.js"></script>
 <script type="text/javascript" charset="utf-8">
-    const roomname = '{{ roomname }}';
+  const roomname = '{{ roomname }}';
 
-    document.addEventListener("DOMContentLoaded", function() {
-        var setuser = document.getElementById("setuser");
-        var userfield = document.getElementById("userfield");
-        // Username modal handling
-        setuser.addEventListener('click', function() {
-            if (userfield.value.length > 0) {
-                clientSetup(userfield.value);
-                document.getElementById('modal').classList.remove('is-active');
-            } else {
-                window.alert("Please enter a username!")
-            }
-        }, false);
+  document.addEventListener("DOMContentLoaded", function () {
+    var setuser = document.getElementById("setuser");
+    var userfield = document.getElementById("userfield");
+    // Username modal handling
+    setuser.addEventListener('click', function () {
+      if (userfield.value.length > 0) {
+        clientSetup(userfield.value);
+        document.getElementById('modal').classList.remove('is-active');
+      } else {
+        window.alert("Please enter a username!")
+      }
+    }, false);
+  });
+
+  var clientSetup = function (username) {
+    var socket = io.connect('http://' + document.domain + ':' + location.port);
+
+    // Join specified room on socket connect
+    socket.on('connect', function () {
+      console.log('joining room ' + roomname);
+      socket.emit('join', { room: roomname, username: username });
     });
 
-    var clientSetup = function(username) {
-        var socket = io.connect('http://' + document.domain + ':' + location.port);
+    // Leave room on page unload
+    window.addEventListener('beforeunload', (event) => {
+      console.log('leaving room ' + roomname);
+      socket.emit('leave', { room: roomname, username: username });
+      return;
+    });
 
-        // Join specified room on socket connect
-        socket.on('connect', function() {
-            console.log('joining room ' + roomname);
-            socket.emit('join', {room: roomname, username: username});
-        });
+    // General chatroom info message receiving
+    var chatarea = document.getElementById('chatarea');
+    socket.on('message', function (data) {
+      console.log(data);
+      chatarea.innerHTML = chatarea.innerHTML + data + '<br/>';
+    })
 
-        // Message receiving
-        var chatarea = document.getElementById('chatarea');
-        socket.on('message', function(data) {
-            console.log(data);
-            chatarea.innerHTML = chatarea.innerHTML + data + '<br/>';
-        })
+    // User broadcasted message receiving
+    socket.on('broadcast', function (data) {
+      console.log(data);
+      var sender = data['sender'];
+      var msg = data['msg'];
+      var to_append = '<b>' + sender + '</b>: ' + msg + '<br/>';
+      chatarea.innerHTML = chatarea.innerHTML + to_append;
+    })
 
-        // Broadcast receiving
-        socket.on('broadcast', function(data) {
-            console.log(data);
-            var sender = data['sender'];
-            var msg = data['msg'];
-            var to_append = '<b>' + sender + '</b>: ' + msg + '<br/>';
-            chatarea.innerHTML = chatarea.innerHTML + to_append;
-        })
-
-        // Message sending
-        var textinput = document.getElementById('textinput');
-        var button = document.getElementById("send");
-        button.addEventListener('click', function() {
-            console.log(textinput.value);
-            socket.emit('message', {room: roomname, msg: textinput.value});
-            textinput.value = "";
-        }, false);
-    }
+    // Message sending
+    var textinput = document.getElementById('textinput');
+    var button = document.getElementById("send");
+    button.addEventListener('click', function () {
+      console.log(textinput.value);
+      socket.emit('message', { room: roomname, msg: textinput.value });
+      textinput.value = "";
+    }, false);
+  }
 
 </script>
 
