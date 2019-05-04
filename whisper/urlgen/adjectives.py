@@ -35,6 +35,7 @@ adj_list = [
 	'cavernous',
 	'celebrated',
 	'charming',
+	'chonky',
 	'damaged',
 	'damp',
 	'dangerous',

@@ -410,6 +410,7 @@ animal_list = [
 	'chinesecrocodilelizard',
 	'chipmunk',
 	'chital',
+	'chonker',
 	'chrysalis',
 	'chrysomelid',
 	'chuckwalla',
