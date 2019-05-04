@@ -3,52 +3,52 @@
 <head>
   <title>join a conversation</title>
 
-    <!-- Styles -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.7.1/css/bulma.min.css">
+  <!-- Styles -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.7.1/css/bulma.min.css">
 </head>
 
 <body>
 
-<!-- Hero -->
-<section class="hero is-fullheight is-dark is-bold">
-  <!-- Hero Head -->
-  <div class="hero-head">
-  </div>
+  <!-- Hero -->
+  <section class="hero is-fullheight is-dark is-bold">
+    <!-- Hero Head -->
+    <div class="hero-head">
+    </div>
 
-  <!-- Hero Body -->
-  <div class="hero-body">
-    <div class="container has-text-centered">
-      <h1 class="title">
-        join a conversation
-      </h1>
-      <h2 class="subtitle">
-        enter your unique conversation code
-      </h2>
-      <div class="field has-addons has-addons-centered">
-        <div class="control">
-          <input id="code" class="input is-large" type="text" placeholder="enter code here">
-        </div>
-        <div class="control">
-          <a id="join" class="button is-large is-black">
-            join
-          </a>
+    <!-- Hero Body -->
+    <div class="hero-body">
+      <div class="container has-text-centered">
+        <h1 class="title">
+          join a conversation
+        </h1>
+        <h2 class="subtitle">
+          enter your unique conversation code
+        </h2>
+        <div class="field has-addons has-addons-centered">
+          <div class="control">
+            <input id="code" class="input is-large" type="text" placeholder="enter code here">
+          </div>
+          <div class="control">
+            <a id="join" class="button is-large is-black">
+              join
+            </a>
+          </div>
         </div>
       </div>
     </div>
-  </div>
 
-  <!-- Hero Foot -->
-  <div class="hero-foot">
-  </div>
-</section>
+    <!-- Hero Foot -->
+    <div class="hero-foot">
+    </div>
+  </section>
 
-<script>
-  var field = document.getElementById("code");
-  var button = document.getElementById("join");
+  <script>
+    var field = document.getElementById("code");
+    var button = document.getElementById("join");
 
-  button.addEventListener('click', function() {
-    window.location.href = '/' + field.value;
-  }, false);
-</script>
+    button.addEventListener('click', function () {
+      window.location.href = '/' + field.value;
+    }, false);
+  </script>
 
 </body>
